@@ -1,4 +1,4 @@
-from base_model.base_model import Model
+from base_model import Model
 import numpy as np
 
 puertos = list(range(6))  # Puertos del 0 al 5

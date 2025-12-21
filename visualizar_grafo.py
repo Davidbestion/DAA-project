@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-from base_model.base_model import Model
+from base_model import Model
 
 def crear_grafo_desde_modelo(modelo):
     """Crea un grafo dirigido NetworkX desde el modelo."""
