@@ -71,8 +71,11 @@ class BruteForceSolver(ABCSolver):
         m = instance.m
         steps = len(route)
         pesos = instance.pesos
-        precios_c = instance.precios_compra
-        precios_v = instance.precios_venta
+        # Desde el punto de vista del comerciante:
+        # - Compra del puerto a precios_venta (lo que el puerto vende)
+        # - Vende al puerto a precios_compra (lo que el puerto compra)
+        precios_compra_comerciante = instance.precios_venta  # Compra del puerto
+        precios_venta_comerciante = instance.precios_compra  # Vende al puerto
         oferta = instance.oferta_max
 
         best_capital = -np.inf
@@ -102,8 +105,9 @@ class BruteForceSolver(ABCSolver):
             for sells in itertools.product(*sell_ranges):
                 sells_arr = np.array(sells, dtype=float)
                 cargo_after_sell = cargo - sells_arr
+                # Cuando el comerciante VENDE al puerto, usa precios_compra (lo que el puerto compra)
                 capital_after_sell = capital + float(
-                    np.dot(sells_arr, precios_v[current_port])
+                    np.dot(sells_arr, precios_venta_comerciante[:, current_port])
                 )
 
                 current_weight = float(np.dot(cargo_after_sell, pesos))
@@ -111,14 +115,15 @@ class BruteForceSolver(ABCSolver):
                     continue
 
                 # Límite máximo de compra por commodity
+                # Cuando el comerciante COMPRA del puerto, usa precios_venta (lo que el puerto vende)
                 buy_max = []
                 for k in range(m):
-                    price = precios_c[current_port, k]
+                    price = precios_compra_comerciante[k, current_port]
                     if price <= 0:
-                        max_by_capital = oferta[current_port, k]
+                        max_by_capital = oferta[k, current_port]
                     else:
                         max_by_capital = capital_after_sell / price
-                    max_by_offer = oferta[current_port, k]
+                    max_by_offer = oferta[k, current_port]
                     max_by_weight = (
                         (instance.capacidad_bodega - current_weight) / pesos[k]
                         if pesos[k] > 0
@@ -137,7 +142,7 @@ class BruteForceSolver(ABCSolver):
                     if new_weight > instance.capacidad_bodega + 1e-9:
                         continue
 
-                    cost_buys = float(np.dot(buys_arr, precios_c[current_port]))
+                    cost_buys = float(np.dot(buys_arr, precios_compra_comerciante[:, current_port]))
                     capital_after_buy = capital_after_sell - cost_buys
                     if capital_after_buy < 0:
                         continue
