@@ -40,8 +40,8 @@ INSTANCE_TINY = DTPInstance(
     ),
     oferta_max=np.array(
         [
-            [20.0, 15.0, 25.0],  # Mercancía 0
-            [15.0, 20.0, 18.0],  # Mercancía 1
+            [5.0, 4.0, 6.0],  # Mercancía 0
+            [4.0, 5.0, 4.0],  # Mercancía 1
         ]
     ),
     pesos=np.array([2.0, 3.0]),
