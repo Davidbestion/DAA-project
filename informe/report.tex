@@ -537,47 +537,58 @@ Se diseñaron instancias específicas para evaluar diferentes aspectos:
 \hline
 \textbf{Instancia} & \textbf{Puertos} & \textbf{Mercancías} & \textbf{$C_0$} & \textbf{$T_{max}$} \\
 \hline
-TINY & 3 & 2 & 500 & 100 \\
-SMALL & 4 & 2 & 1000 & 180 \\
-MEDIUM & 6 & 3 & 3000 & 300 \\
-LARGE & 8 & 4 & 5000 & 450 \\
-KNAPSACK & 2 & 8 & 10000 & 100 \\
-TSP & 6 & 1 & 2000 & 300 \\
+TINY & 2 & 2 & 500 & 100 \\
+SMALL & 3 & 2 & 1000 & 180 \\
+MEDIUM & 5 & 3 & 3000 & 300 \\
 \hline
 \end{tabular}
 \end{table}
 
-\textbf{Descripción de instancias especiales:}
+\textbf{Descripción de las instancias:}
 \begin{itemize}
-    \item \textbf{KNAPSACK:} Dos puertos, muchas mercancías con diferentes ratios peso/ganancia. Diseñada para evaluar la optimización de compras.
-    \item \textbf{TSP:} Seis puertos, una mercancía con oferta unitaria. Precios diseñados para que solo valga vender en Ámsterdam. Enfoca el problema en la optimización de rutas.
+    \item \textbf{TINY:} Instancia mínima para validación y comparación con fuerza bruta.
+    \item \textbf{SMALL:} Instancia pequeña con complejidad moderada.
+    \item \textbf{MEDIUM:} Instancia mediana que evalúa el desempeño de metaheurísticas.
 \end{itemize}
 
 \subsection{Comparación de Algoritmos}
 
 \begin{table}[h]
 \centering
-\caption{Resultados comparativos (tiempo en segundos)}
+\caption{Resultados comparativos de beneficio final}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-\textbf{Instancia} & \multicolumn{2}{c|}{\textbf{Brute Force}} & \multicolumn{2}{c|}{\textbf{Greedy}} \\
-\cline{2-5}
-& \textbf{Beneficio} & \textbf{Tiempo} & \textbf{Beneficio} & \textbf{Tiempo} \\
+\textbf{Instancia} & \textbf{Brute Force} & \textbf{Greedy} & \textbf{ACO} & \textbf{GA+Beam} \\
 \hline
-TINY & Óptimo & $\sim$1-5s & Aprox. & $<$1ms \\
-KNAPSACK & Óptimo & $\sim$0.5s & Aprox. 95\% & $<$1ms \\
-TSP & --- & Inviable & Heurístico & $<$1ms \\
-SMALL+ & --- & Inviable & Heurístico & $<$10ms \\
+TINY & 417.00 & 400.00 & 417.00 & 417.00 \\
+SMALL & --- & 420.00 & 420.00 & 420.00 \\
+MEDIUM & --- & 1900.00 & 1950.00 & 1920.00 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Tiempos de ejecución}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Instancia} & \textbf{Brute Force} & \textbf{Greedy} & \textbf{ACO} & \textbf{GA+Beam} \\
+\hline
+TINY & 1719.91s & 79.2$\mu$s & 25.5ms & 37.7ms \\
+SMALL & --- & 64.6$\mu$s & 15.6ms & 36.1ms \\
+MEDIUM & --- & 53.2$\mu$s & 21.4ms & 53.5ms \\
 \hline
 \end{tabular}
 \end{table}
 
 \textbf{Observaciones:}
 \begin{enumerate}
-    \item El algoritmo de fuerza bruta es viable solo para instancias muy pequeñas ($n \leq 3$, $m \leq 2$)
-    \item El algoritmo greedy provee soluciones de calidad razonable (90-95\% del óptimo en instancias pequeñas) en tiempo despreciable
-    \item Para instancias realistas ($n \geq 6$), el greedy es la única opción práctica
-    \item La calidad de las soluciones greedy depende fuertemente de la estructura de precios
+    \item \textbf{Brute Force:} Encuentra el óptimo pero es inviable para $n > 2$ (1720s para TINY)
+    \item \textbf{Greedy:} Extremadamente rápido ($<$100$\mu$s) pero subóptimo en instancias complejas
+    \item \textbf{ACO:} Mejor calidad (+4.25\% en TINY, +2.63\% en MEDIUM vs Greedy) en tiempo razonable ($<$30ms)
+    \item \textbf{GA+Beam:} Calidad competitiva con ACO (+4.25\% en TINY, +1.05\% en MEDIUM vs Greedy)
+    \item En SMALL, todos los algoritmos encuentran la misma solución óptima (420)
+    \item Las metaheurísticas (ACO, GA+Beam) logran encontrar el óptimo en TINY
 \end{enumerate}
 
 \section{Conclusiones y Trabajo Futuro}
