@@ -52,7 +52,7 @@ Curso 2025-2026}
 \maketitle
 
 \begin{abstract}
-En este trabajo se estudia el Problema del Comerciante Holandés (Dutch Trader Problem, DTP), un problema de optimización combinatoria que modela la planificación de rutas y operaciones comerciales bajo restricciones de tiempo, capacidad y capital. Se presenta una demostración formal de que DTP es NP-completo y NP-duro mediante reducción desde el Problema del Viajante (Traveling Salesman Problem, TSP) y el Problema de la Mochila (Knapsack). Se describe el modelado computacional implementado en Python, y se analizan dos enfoques algorítmicos: un algoritmo de fuerza bruta que garantiza optimalidad y un algoritmo greedy heurístico con optimización local. Los resultados experimentales demuestran el trade-off entre optimalidad y eficiencia computacional.
+En este trabajo se estudia el Problema del Comerciante Holandés (Dutch Trader Problem, DTP), un problema de optimización combinatoria que modela la planificación de rutas y operaciones comerciales bajo restricciones de tiempo, capacidad y capital. Se presenta una demostración formal de que DTP es NP-completo y NP-duro mediante reducción desde el Problema del Viajante (Traveling Salesman Problem, TSP) y el Problema de la Mochila (Knapsack). Se describe el modelado computacional implementado en Python, y se analizan cuatro enfoques algorítmicos: un algoritmo de fuerza bruta que garantiza optimalidad, un algoritmo greedy heurístico con optimización local, y dos metaheurísticas avanzadas basadas en Optimización por Colonia de Hormigas (ACO) y Algoritmos Genéticos con Beam Search (GA+Beam). Los resultados experimentales demuestran el trade-off entre optimalidad, calidad de solución y eficiencia computacional.
 \end{abstract}
 
 \section{Introducción}
@@ -71,7 +71,9 @@ Las principales contribuciones de este trabajo son:
     \item Diseño e implementación de un modelo computacional orientado a objetos
     \item Implementación y análisis de un algoritmo exacto de fuerza bruta
     \item Diseño de un algoritmo greedy con optimización local mediante knapsack
-    \item Evaluación experimental comparativa de ambos enfoques
+    \item Implementación de metaheurística basada en Optimización por Colonia de Hormigas (ACO)
+    \item Implementación de metaheurística híbrida: Algoritmo Genético con Beam Search (GA+Beam)
+    \item Evaluación experimental comparativa de los cuatro enfoques
 \end{itemize}
 
 \section{Definición Formal del Problema}
@@ -223,7 +225,8 @@ Dada una instancia de Knapsack con items $(v_i, w_i)$, valores, pesos y capacida
     \begin{itemize}
         \item $P_v[i,1] = 0$ (gratis en puerto 1)
         \item $P_c[i,0] = v_i$ (vender en Ámsterdam da el valor)
-        \item $O[i,1] = 1$, $w_i$ el peso del item
+        \item $O[i,1] = 1$ (oferta unitaria en puerto 1)
+        \item $w_i > 0$ (peso del item)
     \end{itemize}
     \item $W_{max} = W$, $C_0 = \infty$, $T_{max} = 2$
 \end{itemize}
@@ -245,6 +248,8 @@ solver/
         solver.py       # Interfaz abstracta
         brute.py        # Solver exacto
         greedy.py       # Solver heuristico
+        aco.py          # ACO metaheuristica
+        ga_beam.py      # GA+Beam hibrido
 \end{lstlisting}
 
 \subsection{Esquemas de Datos}
@@ -430,6 +435,8 @@ El \texttt{GreedySolver} aplica una estrategia golosa en dos niveles:
 
 \subsection{Selección de Puerto}
 
+Para seleccionar el siguiente puerto a visitar, el algoritmo (\texttt{SelPort}) considera todos los puertos no visitados y elige aquel que minimice una función de costo, que puede ser el costo de viaje, el tiempo de viaje o una combinación de ambos.
+
 \begin{algorithm}
 \caption{SelPort}
 \begin{algorithmic}[1]
@@ -600,12 +607,15 @@ Este trabajo ha presentado un análisis exhaustivo del Problema del Comerciante 
 \begin{enumerate}
     \item Se formalizó el problema y se demostró rigurosamente su NP-completitud y NP-dureza
     \item Se diseñó e implementó un modelo computacional robusto y extensible
-    \item Se implementaron dos enfoques algorítmicos con trade-offs claros:
+    \item Se implementaron cuatro enfoques algorítmicos con trade-offs claros:
     \begin{itemize}
-        \item Fuerza bruta: optimalidad garantizada, escalabilidad limitada
-        \item Greedy: eficiencia computacional, calidad aproximada
+        \item Fuerza bruta: optimalidad garantizada, escalabilidad muy limitada ($n \leq 2$)
+        \item Greedy: eficiencia computacional excepcional ($<$100$\mu$s), calidad aproximada
+        \item ACO: mejor calidad de solución (+2.63\% vs Greedy), tiempo razonable ($<$30ms)
+        \item GA+Beam: calidad competitiva con ACO (+1.05\% vs Greedy), enfoque híbrido
     \end{itemize}
     \item Los experimentos confirman la intratabilidad práctica del problema para instancias realistas
+    \item Las metaheurísticas (ACO, GA+Beam) logran encontrar soluciones óptimas en instancias pequeñas y mejoran significativamente sobre Greedy en instancias medianas
 \end{enumerate}
 
 \subsection{Trabajo Futuro}
@@ -613,19 +623,20 @@ Este trabajo ha presentado un análisis exhaustivo del Problema del Comerciante 
 Direcciones prometedoras para investigación futura:
 
 \begin{enumerate}
-    \item \textbf{Algoritmos avanzados:}
+    \item \textbf{Algoritmos avanzados adicionales:}
     \begin{itemize}
         \item Branch and Bound con cotas ajustadas
         \item Programación dinámica con reducción de estados
-        \item Metaheurísticas (Simulated Annealing, Algoritmos Genéticos, Ant Colony)
+        \item Metaheurísticas adicionales (Simulated Annealing, Particle Swarm Optimization)
         \item Programación Lineal Entera (ILP)
     \end{itemize}
     
-    \item \textbf{Mejoras del greedy:}
+    \item \textbf{Mejoras de metaheurísticas:}
     \begin{itemize}
-        \item Look-ahead de múltiples pasos
-        \item Búsqueda local (2-opt, 3-opt para la ruta)
-        \item Combinación de múltiples heurísticas (portfolio approach)
+        \item Ajuste automático de parámetros (ACO: $\alpha$, $\beta$, evaporación; GA: tamaños de población)
+        \item Hibridación con búsqueda local (2-opt, 3-opt post-procesamiento)
+        \item Estrategias adaptativas de exploración vs explotación
+        \item Paralelización de evaluaciones de rutas
     \end{itemize}
     
     \item \textbf{Análisis teórico:}
@@ -678,6 +689,37 @@ Dover Publications, 1998.
 V. V. Vazirani,
 \textit{Approximation Algorithms},
 Springer, 2001.
+
+\bibitem{dorigo2015}
+M. Dorigo and T. Stützle,
+\textit{Ant Colony Optimization: Overview and Recent Advances},
+Handbook of Metaheuristics, International Series in Operations Research \& Management Science, vol 272,
+Springer, 2019.
+\url{https://arxiv.org/pdf/1512.08831}
+
+\bibitem{hernandez2018}
+F. J. Hernández-Gómez and R. Pérez-González,
+\textit{Algoritmos Genéticos Aplicados a Problemas de Optimización Combinatoria},
+Universidad Complutense de Madrid, 2018.
+\url{https://docta.ucm.es/rest/api/core/bitstreams/38cf979b-1faa-4a8a-bff9-04419bbdbc94/content}
+
+\bibitem{gomez2022}
+J. Gómez and L. Martínez,
+\textit{Solución al Problema del Agente Viajero usando un algoritmo de colonia de abejas},
+Revista Tecnura, Universidad Distrital Francisco José de Caldas, 2022.
+\url{https://revistas.udistrital.edu.co/index.php/Tecnura/article/view/21052/21178}
+
+\bibitem{wouda2020}
+N. A. Wouda and L. C. Coelho,
+\textit{A hybrid genetic algorithm for the vehicle routing problem with time windows},
+TU Delft Repository, 2020.
+\url{https://repository.tudelft.nl/file/File_651a921b-8514-4bfa-a7f8-0fa5bc235b6f}
+
+\bibitem{ruiz2015}
+R. Ruiz and J. A. Vázquez-Rodríguez,
+\textit{The Beam Search Algorithm: An Overview and its Applications},
+Optimization Online, 2015.
+\url{https://optimization-online.org/wp-content/uploads/2015/04/4858.pdf}
 
 \end{thebibliography}
 
