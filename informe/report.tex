@@ -531,6 +531,209 @@ compras = KnapsackGreedy(..., capital_disponible, ...)
     \item Ejecución en tiempo polinomial
 \end{enumerate}
 
+\section{Algoritmo de Optimización por Colonia de Hormigas (ACO)}
+
+\subsection{Descripción del Algoritmo}
+
+El \texttt{ACOSolver} es una metaheurística inspirada en el comportamiento de las hormigas reales al buscar caminos entre su colonia y fuentes de alimento. Las hormigas depositan feromonas en los caminos que recorren, y tienden a seguir caminos con mayor concentración de feromonas, creando un mecanismo de retroalimentación positiva que refuerza las buenas soluciones.
+
+\subsubsection{Componentes Principales}
+
+\begin{enumerate}
+    \item \textbf{Matriz de Feromonas:} $\tau_{ij}$ representa la cantidad de feromonas en el arco $(i,j)$. Se inicializa uniformemente:
+    $$\tau_{ij} = \tau_0 = \frac{1}{n \cdot C_0}$$
+
+    \item \textbf{Información Heurística:} Combina costo y tiempo de viaje normalizados:
+    $$\eta_{ij} = \frac{1}{0.5 \cdot \frac{c_{ij}}{\max(c)} + 0.5 \cdot \frac{t_{ij}}{\max(t)}}$$
+    donde se pondera igualmente costo y tiempo de viaje.
+
+    \item \textbf{Construcción Probabilística de Rutas:} Cada hormiga construye una ruta seleccionando el siguiente puerto con probabilidad:
+    $$p_{ij} = \frac{[\tau_{ij}]^\alpha \cdot [\eta_{ij}]^\beta}{\sum_{k \in N_i} [\tau_{ik}]^\alpha \cdot [\eta_{ik}]^\beta}$$
+    donde $\alpha$ controla la influencia de feromonas y $\beta$ la influencia de la heurística.
+
+    \item \textbf{Optimización de Trading:} En cada puerto, se aplica un algoritmo greedy de knapsack (igual que en el GreedySolver) para determinar las compras óptimas conociendo el próximo puerto a visitar.
+
+    \item \textbf{Actualización de Feromonas:} Después de que todas las hormigas construyen sus soluciones:
+    \begin{itemize}
+        \item \textbf{Evaporación:} $\tau_{ij} \leftarrow (1 - \rho) \cdot \tau_{ij}$ donde $\rho$ es la tasa de evaporación
+        \item \textbf{Depósito:} Las hormigas depositan feromona proporcional a la calidad de su solución:
+        $$\tau_{ij} \leftarrow \tau_{ij} + \sum_{k=1}^{m_{ants}} \Delta\tau_{ij}^k$$
+        donde $\Delta\tau_{ij}^k = Q \cdot \frac{f_k}{|f_k| + 1}$ si la hormiga $k$ usó el arco $(i,j)$, siendo $f_k$ el beneficio de la solución $k$ y $Q$ una constante de depósito.
+    \end{itemize}
+\end{enumerate}
+
+\begin{algorithm}
+\caption{ACOSolver}
+\begin{algorithmic}[1]
+\Procedure{Solve}{$inst$}
+    \State Inicializar $\tau_{ij} = \tau_0$ para todos los arcos
+    \State $best \gets$ solución trivial
+    \For{$iter = 1$ \textbf{to} $n_{iterations}$}
+        \State $solutions \gets []$
+        \For{$ant = 1$ \textbf{to} $n_{ants}$}
+            \State $route \gets \Call{ConstructRoute}{inst, \tau}$
+            \State $sol \gets \Call{EvaluateRoute}{inst, route}$
+            \If{$sol \neq \texttt{None}$ \textbf{and} $sol.benef > best.benef$}
+                \State $best \gets sol$
+            \EndIf
+            \State $solutions.\text{append}(sol)$
+        \EndFor
+        \State \Call{UpdatePheromones}{$\tau$, $solutions$}
+    \EndFor
+    \State \Return $best$
+\EndProcedure
+\Procedure{ConstructRoute}{$inst, \tau$}
+    \State $cur \gets 0$, $vis \gets \{0\}$, $route \gets [0]$
+    \While{$|vis| < n + 1$}
+        \State $next \gets \Call{SelectNext}{cur, vis, \tau, inst}$
+        \If{$next = \texttt{None}$}
+            \State \textbf{break}
+        \EndIf
+        \State $route.\text{append}(next)$, $vis.\text{add}(next)$, $cur \gets next$
+    \EndWhile
+    \State $route.\text{append}(0)$
+    \State \Return $route$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Análisis de Complejidad}
+
+\textbf{Complejidad temporal:}
+\begin{itemize}
+    \item Por iteración:
+    \begin{itemize}
+        \item Construcción de rutas: $O(m_{ants} \cdot n^2)$ (cada hormiga toma $n$ decisiones con $O(n)$ opciones)
+        \item Evaluación de rutas (greedy knapsack): $O(m_{ants} \cdot n \cdot k \log k)$ donde $k$ es el número de mercancías
+        \item Actualización de feromonas: $O(m_{ants} \cdot n)$
+    \end{itemize}
+    \item Total: $O(I \cdot m_{ants} \cdot (n^2 + n \cdot k \log k))$ donde $I$ es el número de iteraciones
+\end{itemize}
+
+\textbf{Parámetros típicos:} $m_{ants}=10-20$ hormigas, $I=20-50$ iteraciones, $\alpha=1.0$, $\beta=2.0-2.5$, $\rho=0.3-0.6$, $Q=100$.
+
+\textbf{Garantías:} No garantiza optimalidad, pero:
+\begin{enumerate}
+    \item Convergencia probabilística hacia buenas soluciones
+    \item Balance entre exploración (diversidad) y explotación (intensificación)
+    \item Memoria a largo plazo mediante feromonas
+\end{enumerate}
+
+\section{Algoritmo Genético con Beam Search (GA+Beam)}
+
+\subsection{Descripción del Algoritmo}
+
+El \texttt{GABeamSolver} combina dos técnicas complementarias:
+\begin{itemize}
+    \item \textbf{Algoritmo Genético (GA):} Evoluciona una población de rutas mediante selección, crossover y mutación
+    \item \textbf{Beam Search:} Optimiza las decisiones de trading manteniendo los $k$ mejores estados en cada paso
+\end{itemize}
+
+\subsection{Algoritmo Genético para Routing}
+
+\subsubsection{Representación}
+
+Un individuo es una permutación de puertos: $[p_1, p_2, \ldots, p_n]$ que representa la ruta $0 \to p_1 \to p_2 \to \cdots \to p_n \to 0$.
+
+\subsubsection{Operadores Genéticos}
+
+\begin{enumerate}
+    \item \textbf{Selección por Torneo (tournament size $t$):} Selecciona $t$ individuos aleatoriamente de la población y retorna el mejor (mayor fitness).
+    \item \textbf{Crossover (Order Crossover - OX):} Selecciona dos puntos de corte aleatorios, copia el segmento del padre 1 al hijo 1 y llena las posiciones restantes con genes del padre 2 en orden, omitiendo duplicados.
+    \item \textbf{Mutación (Swap):} Intercambia dos posiciones aleatorias.
+    \item \textbf{Elitismo:} Preserva los mejores $e$ individuos sin modificación para garantizar no perder buenas soluciones.
+\end{enumerate}
+
+\subsection{Beam Search para Trading}
+
+Para cada ruta generada por el GA, Beam Search optimiza las decisiones de compra/venta:
+
+\textbf{Estado:} $(capital, cargo, historial\_compras, historial\_ventas)$
+
+\textbf{Proceso:}
+\begin{enumerate}
+    \item Inicializar beam con estado base: $(C_0, \vec{0}, [ ], [ ])$
+    \item Para cada puerto $p$ en la ruta:
+    \begin{enumerate}
+        \item Generar sucesores desde cada estado en el beam:
+        \begin{itemize}
+            \item Vender todo el cargo
+            \item Explorar combinaciones de compra (top-$k$ mercancías por ratio ganancia/peso)
+        \end{itemize}
+        \item Mantener solo los $B$ mejores estados por capital
+    \end{enumerate}
+    \item Retornar el mejor estado final
+\end{enumerate}
+
+\textbf{Exploración de Compras:} Se generan sucesores para:
+\begin{itemize}
+    \item No comprar nada
+    \item Comprar 1 mejor mercancía (mayor $\frac{precio\_venta - precio\_compra}{peso}$)
+    \item Comprar 2 mejores mercancías
+    \item Comprar 3 mejores mercancías
+\end{itemize}
+
+\begin{algorithm}
+\caption{GABeamSolver}
+\begin{algorithmic}[1]
+\Procedure{Solve}{$inst$}
+    \State $pop \gets \Call{InitPopulation}{N}$
+    \State $best \gets$ solución trivial
+    \For{$gen = 1$ \textbf{to} $n_{generations}$}
+        \State $fitness \gets []$
+        \For{$ind \in pop$}
+            \State $sol \gets \Call{EvaluateWithBeam}{inst, ind}$
+            \State $fitness.\text{append}(sol)$
+            \If{$sol \neq \texttt{None}$ \textbf{and} $sol.benef > best.benef$}
+                \State $best \gets sol$
+            \EndIf
+        \EndFor
+        \State $new\_pop \gets \Call{Elitism}{pop, fitness, e}$
+        \While{$|new\_pop| < N$}
+            \State $p1 \gets \Call{TournamentSelect}{pop, fitness}$
+            \State $p2 \gets \Call{TournamentSelect}{pop, fitness}$
+            \State $(c1, c2) \gets \Call{OrderCrossover}{p1, p2}$
+            \If{$random() < p_{mut}$}
+                \State $c1 \gets \Call{SwapMutate}{c1}$
+            \EndIf
+            \State $new\_pop.\text{append}(c1)$
+        \EndWhile
+        \State $pop \gets new\_pop$
+    \EndFor
+    \State \Return $best$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Análisis de Complejidad}
+
+\textbf{Complejidad temporal:}
+\begin{itemize}
+    \item Por generación:
+    \begin{itemize}
+        \item Evaluación de población: $O(P \cdot E)$ donde $E$ es el costo de beam search
+        \item Beam search por ruta: $O(n \cdot B \cdot C \cdot k)$
+        \begin{itemize}
+            \item $n$: puertos en la ruta
+            \item $B$: beam width
+            \item $C$: combinaciones exploradas ($\approx 4$)
+            \item $k$: mercancías
+        \end{itemize}
+        \item Operadores genéticos: $O(P \cdot n)$
+    \end{itemize}
+    \item Total: $O(G \cdot P \cdot n \cdot (log n + B \cdot C \cdot k))$ donde $G$ es el número de generaciones
+\end{itemize}
+
+\textbf{Parámetros típicos:} $P=30-50$ (tamaño de población), $G=50-100$ (generaciones), $B=3-5$ (beam width), $p_{cross}=0.8$ (probabilidad de crossover), $p_{mut}=0.2$ (probabilidad de mutación), $t=3$ (tournament size), $e=2$ (elitismo).
+
+\textbf{Garantías:}
+\begin{enumerate}
+    \item No garantiza optimalidad global
+    \item Elitismo asegura que la mejor solución no empeora
+    \item Beam search garantiza optimalidad local en trading (dentro del beam width)
+    \item Balance exploración-explotación mediante crossover y mutación
+\end{enumerate}
+
 \section{Resultados Experimentales}
 
 \subsection{Instancias de Prueba}
