@@ -7,6 +7,7 @@ Proyecto del curso de Diseño y Análisis de Algoritmos que estudia el **Problem
 ### Descripción del Problema
 
 Un comerciante parte del puerto de Ámsterdam con capital inicial y debe:
+
 - Visitar otros puertos para comprar y vender mercancías
 - Maximizar su capital final al regresar a Ámsterdam
 - Respetar restricciones de:

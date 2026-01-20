@@ -129,9 +129,9 @@ INSTANCE_MEDIUM = DTPInstance(
     ),
     precios_venta=np.array(  # Lo que el puerto COBRA al comerciante
         [
-            [35.0, 40.0, 32.0, 38.0, 42.0, 30.0],  # Mercancía 0 (siempre > precios_compra)
-            [65.0, 62.0, 68.0, 64.0, 60.0, 70.0],  # Mercancía 1 (siempre > precios_compra)
-            [85.0, 88.0, 82.0, 86.0, 84.0, 92.0],  # Mercancía 2 (siempre > precios_compra)
+            [35.0, 40.0, 32.0, 38.0, 42.0, 30.0],  # Mercancía 0
+            [65.0, 62.0, 68.0, 64.0, 60.0, 70.0],  # Mercancía 1
+            [85.0, 88.0, 82.0, 86.0, 84.0, 92.0],  # Mercancía 2
         ]
     ),
     oferta_max=np.array(
@@ -186,10 +186,10 @@ INSTANCE_LARGE = DTPInstance(
     ),
     precios_venta=np.array(  # Lo que el puerto COBRA al comerciante
         [
-            [42.0, 45.0, 38.0, 46.0, 48.0, 36.0, 52.0, 43.0],  # Mercancía 0 (siempre > precios_compra)
-            [70.0, 68.0, 75.0, 71.0, 65.0, 78.0, 62.0, 72.0],  # Mercancía 1 (siempre > precios_compra)
-            [95.0, 98.0, 92.0, 99.0, 96.0, 102.0, 90.0, 100.0],  # Mercancía 2 (siempre > precios_compra)
-            [125.0, 122.0, 130.0, 126.0, 128.0, 118.0, 135.0, 124.0],  # Mercancía 3 (siempre > precios_compra)
+            [42.0, 45.0, 38.0, 46.0, 48.0, 36.0, 52.0, 43.0],  # Mercancía 0
+            [70.0, 68.0, 75.0, 71.0, 65.0, 78.0, 62.0, 72.0],  # Mercancía 1
+            [95.0, 98.0, 92.0, 99.0, 96.0, 102.0, 90.0, 100.0],  # Mercancía 2
+            [125.0, 122.0, 130.0, 126.0, 128.0, 118.0, 135.0, 124.0],  # Mercancía 3
         ]
     ),
     oferta_max=np.array(
@@ -226,45 +226,55 @@ _INSTANCES = {
 # El problema se reduce a decidir qué productos comprar/transportar
 # dadas las restricciones de peso y capital
 INSTANCE_KNAPSACK = DTPInstance(
-    tiempos=np.array([
-        [0.0, 15.0],
-        [15.0, 0.0],
-    ]),
-    costos=np.array([
-        [0.0, 20.0],
-        [20.0, 0.0],
-    ]),
+    tiempos=np.array(
+        [
+            [0.0, 15.0],
+            [15.0, 0.0],
+        ]
+    ),
+    costos=np.array(
+        [
+            [0.0, 20.0],
+            [20.0, 0.0],
+        ]
+    ),
     # 8 mercancías con diferentes pesos y márgenes de ganancia
-    precios_compra=np.array([  # Lo que el puerto PAGA al comerciante
-        [15.0, 45.0],  # Mercancía 0: buen margen
-        [25.0, 60.0],  # Mercancía 1: buen margen
-        [10.0, 35.0],  # Mercancía 2: buen margen
-        [30.0, 70.0],  # Mercancía 3: buen margen
-        [20.0, 50.0],  # Mercancía 4: buen margen
-        [12.0, 38.0],  # Mercancía 5: buen margen
-        [18.0, 55.0],  # Mercancía 6: muy buen margen
-        [22.0, 48.0],  # Mercancía 7: buen margen
-    ]),
-    precios_venta=np.array([  # Lo que el puerto COBRA al comerciante
-        [20.0, 50.0],   # Mercancía 0
-        [30.0, 65.0],   # Mercancía 1
-        [15.0, 40.0],   # Mercancía 2
-        [35.0, 75.0],   # Mercancía 3
-        [25.0, 55.0],   # Mercancía 4
-        [17.0, 43.0],   # Mercancía 5
-        [23.0, 60.0],   # Mercancía 6
-        [27.0, 53.0],   # Mercancía 7
-    ]),
-    oferta_max=np.array([
-        [20.0, 20.0],  # Mercancía 0
-        [15.0, 15.0],  # Mercancía 1
-        [25.0, 25.0],  # Mercancía 2
-        [12.0, 12.0],  # Mercancía 3
-        [18.0, 18.0],  # Mercancía 4
-        [22.0, 22.0],  # Mercancía 5
-        [16.0, 16.0],  # Mercancía 6
-        [20.0, 20.0],  # Mercancía 7
-    ]),
+    precios_compra=np.array(
+        [  # Lo que el puerto PAGA al comerciante
+            [15.0, 45.0],  # Mercancía 0: buen margen
+            [25.0, 60.0],  # Mercancía 1: buen margen
+            [10.0, 35.0],  # Mercancía 2: buen margen
+            [30.0, 70.0],  # Mercancía 3: buen margen
+            [20.0, 50.0],  # Mercancía 4: buen margen
+            [12.0, 38.0],  # Mercancía 5: buen margen
+            [18.0, 55.0],  # Mercancía 6: muy buen margen
+            [22.0, 48.0],  # Mercancía 7: buen margen
+        ]
+    ),
+    precios_venta=np.array(
+        [  # Lo que el puerto COBRA al comerciante
+            [20.0, 50.0],  # Mercancía 0
+            [30.0, 65.0],  # Mercancía 1
+            [15.0, 40.0],  # Mercancía 2
+            [35.0, 75.0],  # Mercancía 3
+            [25.0, 55.0],  # Mercancía 4
+            [17.0, 43.0],  # Mercancía 5
+            [23.0, 60.0],  # Mercancía 6
+            [27.0, 53.0],  # Mercancía 7
+        ]
+    ),
+    oferta_max=np.array(
+        [
+            [20.0, 20.0],  # Mercancía 0
+            [15.0, 15.0],  # Mercancía 1
+            [25.0, 25.0],  # Mercancía 2
+            [12.0, 12.0],  # Mercancía 3
+            [18.0, 18.0],  # Mercancía 4
+            [22.0, 22.0],  # Mercancía 5
+            [16.0, 16.0],  # Mercancía 6
+            [20.0, 20.0],  # Mercancía 7
+        ]
+    ),
     pesos=np.array([2.0, 3.5, 1.5, 5.0, 2.5, 1.8, 4.0, 3.0]),  # Pesos variados
     capacidad_bodega=50,  # Capacidad limitada - clave del problema tipo knapsack
     capital_inicial=10000,
@@ -279,32 +289,44 @@ INSTANCE_KNAPSACK = DTPInstance(
 # Los precios de venta son muy bajos excepto en el puerto 0
 # Esto obliga al problema a enfocarse en encontrar la ruta óptima (minimizar costos)
 INSTANCE_TSP = DTPInstance(
-    tiempos=np.array([
-        [0.0, 25.0, 45.0, 35.0, 50.0, 40.0],
-        [30.0, 0.0, 20.0, 28.0, 35.0, 32.0],
-        [48.0, 22.0, 0.0, 18.0, 30.0, 25.0],
-        [38.0, 30.0, 20.0, 0.0, 22.0, 28.0],
-        [52.0, 38.0, 32.0, 25.0, 0.0, 18.0],
-        [42.0, 35.0, 28.0, 30.0, 20.0, 0.0],
-    ]),
-    costos=np.array([
-        [0.0, 180.0, 280.0, 220.0, 320.0, 260.0],
-        [200.0, 0.0, 140.0, 180.0, 240.0, 210.0],
-        [300.0, 150.0, 0.0, 120.0, 200.0, 170.0],
-        [240.0, 190.0, 130.0, 0.0, 150.0, 180.0],
-        [340.0, 250.0, 210.0, 160.0, 0.0, 120.0],
-        [280.0, 220.0, 180.0, 190.0, 130.0, 0.0],
-    ]),
+    tiempos=np.array(
+        [
+            [0.0, 25.0, 45.0, 35.0, 50.0, 40.0],
+            [30.0, 0.0, 20.0, 28.0, 35.0, 32.0],
+            [48.0, 22.0, 0.0, 18.0, 30.0, 25.0],
+            [38.0, 30.0, 20.0, 0.0, 22.0, 28.0],
+            [52.0, 38.0, 32.0, 25.0, 0.0, 18.0],
+            [42.0, 35.0, 28.0, 30.0, 20.0, 0.0],
+        ]
+    ),
+    costos=np.array(
+        [
+            [0.0, 180.0, 280.0, 220.0, 320.0, 260.0],
+            [200.0, 0.0, 140.0, 180.0, 240.0, 210.0],
+            [300.0, 150.0, 0.0, 120.0, 200.0, 170.0],
+            [240.0, 190.0, 130.0, 0.0, 150.0, 180.0],
+            [340.0, 250.0, 210.0, 160.0, 0.0, 120.0],
+            [280.0, 220.0, 180.0, 190.0, 130.0, 0.0],
+        ]
+    ),
     # Solo 1 mercancía
-    precios_compra=np.array([  # Lo que el puerto PAGA al comerciante
-        [80.0, 5.0, 5.0, 5.0, 5.0, 5.0],  # Solo en puerto 0 paga bien
-    ]),
-    precios_venta=np.array([  # Lo que el puerto COBRA al comerciante
-        [100.0, 10.0, 10.0, 10.0, 10.0, 10.0],  # Solo en puerto 0 vale la pena vender
-    ]),
-    oferta_max=np.array([
-        [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],  # Solo 1 unidad disponible en cada puerto
-    ]),
+    precios_compra=np.array(
+        [  # Lo que el puerto PAGA al comerciante
+            [80.0, 5.0, 5.0, 5.0, 5.0, 5.0],  # Solo en puerto 0 paga bien
+        ]
+    ),
+    precios_venta=np.array(
+        [
+            # Lo que el puerto COBRA al comerciante
+            # Solo en puerto 0 vale la pena vender
+            [100.0, 10.0, 10.0, 10.0, 10.0, 10.0],
+        ]
+    ),
+    oferta_max=np.array(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],  # Solo 1 unidad disponible en cada puerto
+        ]
+    ),
     pesos=np.array([1.0]),  # Peso mínimo
     capacidad_bodega=5,  # Puede llevar todas las mercancías disponibles
     capital_inicial=2000,  # Capital alto para no ser restricción
@@ -348,9 +370,5 @@ def get_instance_by_name(name: str) -> DTPInstance:
     """
     if name not in _INSTANCES:
         available = ", ".join(_INSTANCES.keys())
-        raise KeyError(
-            f"Instancia '{name}' no encontrada. Disponibles: {available}"
-        )
+        raise KeyError(f"Instancia '{name}' no encontrada. Disponibles: {available}")
     return _INSTANCES[name]
-
-

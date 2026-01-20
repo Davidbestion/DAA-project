@@ -55,24 +55,20 @@ class RandomDTPGenerator:
         total_ports = n_ports + 1  # +1 para incluir Ámsterdam (puerto 0)
 
         # Generar matrices de tiempo y costo (asimétricas, con diagonal 0)
-        tiempos = self._generate_matrix(
-            total_ports, time_range[0], time_range[1]
-        )
-        costos = self._generate_matrix(
-            total_ports, cost_range[0], cost_range[1]
-        )
+        tiempos = self._generate_matrix(total_ports, time_range[0], time_range[1])
+        costos = self._generate_matrix(total_ports, cost_range[0], cost_range[1])
 
         # Generar matrices de precios de compra y venta (mercancías x puertos)
         # IMPORTANTE: Desde el punto de vista del PUERTO:
         # - precios_compra: precio al que el puerto COMPRA del comerciante
         # - precios_venta: precio al que el puerto VENDE al comerciante
         # Para que haya oportunidades de negocio: precios_compra < precios_venta
-        
+
         # Generar precios de compra del puerto (lo que paga al comerciante)
         precios_compra = self.rng.uniform(
             buy_price_range[0], buy_price_range[1], size=(n_goods, total_ports)
         )
-        
+
         # Precios de venta del puerto deben ser mayores (lo que cobra al comerciante)
         # Agregar un margen positivo para asegurar precios_venta > precios_compra
         margen = self.rng.uniform(
@@ -96,19 +92,17 @@ class RandomDTPGenerator:
         # pesos = self.rng.integers(int(weight_range[0]), int(weight_range[1]) + 1, size=n_goods)
 
         # Generar parámetros escalares
-        capacidad_bodega = int(self.rng.integers(
-            cargo_capacity_range[0], cargo_capacity_range[1] + 1
-        ))
-        capital_inicial = int(self.rng.integers(
-            initial_capital_range[0], initial_capital_range[1] + 1
-        ))
+        capacidad_bodega = int(
+            self.rng.integers(cargo_capacity_range[0], cargo_capacity_range[1] + 1)
+        )
+        capital_inicial = int(
+            self.rng.integers(initial_capital_range[0], initial_capital_range[1] + 1)
+        )
         tiempo_maximo = int(self.rng.uniform(max_time_range[0], max_time_range[1]))
         umbral_beneficio = self.rng.uniform(
             profit_threshold_range[0], profit_threshold_range[1]
         )
-        capital_minimo = self.rng.uniform(
-            min_capital_range[0], min_capital_range[1]
-        )
+        capital_minimo = self.rng.uniform(min_capital_range[0], min_capital_range[1])
 
         return DTPInstance(
             tiempos=tiempos,
@@ -122,11 +116,9 @@ class RandomDTPGenerator:
             tiempo_maximo=tiempo_maximo,
             umbral_beneficio=umbral_beneficio,
             capital_minimo=capital_minimo,
-        ) 
+        )
 
-    def _generate_matrix(
-        self, size: int, min_val: float, max_val: float
-    ) -> np.ndarray:
+    def _generate_matrix(self, size: int, min_val: float, max_val: float) -> np.ndarray:
         """Genera una matriz con diagonal cero.
 
         Se asume que A -> B puede tener un valor diferente a B -> A,
@@ -144,7 +136,7 @@ class RandomDTPGenerator:
         matrix = self.rng.uniform(min_val, max_val, size=(size, size))
         # Poner la diagonal en cero (no hay costo/tiempo de un puerto a sí mismo)
         np.fill_diagonal(matrix, 0.0)
-        
+
         return matrix
 
     def generate_batch(self, n_instances: int, **kwargs) -> list[DTPInstance]:
@@ -215,7 +207,8 @@ def generate_large_instance(seed: int | None = None) -> DTPInstance:
         initial_capital_range=(5000, 10000),
         max_time_range=(500.0, 800.0),
     )
-    
+
+
 ##################### TESTS #####################################
 
 # if __name__ == "__main__":

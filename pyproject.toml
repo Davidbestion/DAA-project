@@ -7,11 +7,13 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "numpy>=1.24.0",
+    "pytest>=9.0.2",
 ]
 
 [project.scripts]
 main = "daa.main:main"
 solver = "solver:test_solver"
+compare = "solver.tests.test_compare:display_comparison"
 
 [build-system]
 requires = ["hatchling"]
